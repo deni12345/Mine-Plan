@@ -15,7 +15,7 @@ import {
   useTheme,
 } from "@mui/material";
 
-const drawerWidth = 240;
+export const drawerWidth = 240;
 
 interface MuiDrawerProps {
   open?: boolean;
@@ -33,7 +33,7 @@ export const MuiDrawer = (props: MuiDrawerProps) => {
           width: drawerWidth,
           boxSizing: "border-box",
         },
-        zIndex: 10,
+        zIndex: 2,
       }}
       variant="persistent"
       anchor="left"
