@@ -1,12 +1,13 @@
 import { IconButton, Toolbar, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MenuIcon from "@mui/icons-material/Menu";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { MuiDrawer } from "./MuiDrawer";
 import { ContextType } from "../types/context";
 import useHome, { Plan } from "./Home.hook";
 import Main from "./MuiMain";
 import MuiAppBar from "./MuiAppBar";
+import dayjs from "dayjs";
 
 export const HomeContext = createContext<ContextType>({
   plan: {} as Plan,
@@ -15,6 +16,7 @@ export const HomeContext = createContext<ContextType>({
 const Home = () => {
   const { plan, isloading } = useHome();
   const [open, setOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<dayjs.Dayjs>(dayjs());
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -23,6 +25,10 @@ const Home = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    console.log(selectedDay);
+  }, [selectedDay]);
 
   return (
     <Grid container direction={"column"} height={"100vh"}>
@@ -53,7 +59,11 @@ const Home = () => {
           <MuiDrawer open={open} handleDrawerClose={handleDrawerClose} />
         </Grid>
         <Grid flex={1}>
-          <Main open={open} isloading={isloading} />
+          <Main
+            setSelectedDay={setSelectedDay}
+            selectedDay={selectedDay}
+            isloading={isloading}
+          />
         </Grid>
       </HomeContext.Provider>
     </Grid>

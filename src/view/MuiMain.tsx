@@ -9,21 +9,27 @@ import {
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { drawerWidth } from "./MuiDrawer";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
   DateCalendar,
+  DateView,
   DayCalendarSkeleton,
   LocalizationProvider,
   PickersDay,
   PickersDayProps,
 } from "@mui/x-date-pickers";
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import { HomeContext } from "./Home";
 import dayjs from "dayjs";
+import { PickerSelectionState } from "@mui/x-date-pickers/internals";
+import MuiCard from "./MuiCard";
+
+interface MainProps extends AppBarProps {
+  selectedDay: dayjs.Dayjs;
+  setSelectedDay: (value: dayjs.Dayjs) => void;
+}
 
 interface AppBarProps extends StackProps {
-  open?: boolean;
   isloading?: boolean;
 }
 
@@ -31,11 +37,21 @@ interface EventProps extends PickersDayProps<dayjs.Dayjs> {
   events?: dayjs.Dayjs[];
 }
 
-const Main = ({ open, isloading }: AppBarProps) => {
+const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
   const { plan } = useContext(HomeContext);
+  const onDayChange = useCallback(
+    (
+      value: any,
+      selectionState?: PickerSelectionState | undefined,
+      selectedView?: DateView | undefined
+    ): void => {
+      selectedView === "day" && setSelectedDay(dayjs(value));
+    },
+    [setSelectedDay]
+  );
 
   return (
-    <MuiMain open={open} isloading={isloading}>
+    <MuiMain isloading={isloading}>
       {isloading ? (
         <Box
           component={Container}
@@ -59,6 +75,8 @@ const Main = ({ open, isloading }: AppBarProps) => {
           <Grid component={Card} size={{ xs: 12, md: 3 }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
+                onChange={onDayChange}
+                value={selectedDay}
                 loading={isloading}
                 renderLoading={() => <DayCalendarSkeleton />}
                 slots={{
@@ -74,8 +92,13 @@ const Main = ({ open, isloading }: AppBarProps) => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid size={{ xs: 12, md: 8 }} textAlign={"center"} component={Card}>
-            <Typography>test</Typography>
+          <Grid
+            size={{ xs: 12, md: 8 }}
+            component={Card}
+            justifyItems={"center"}
+            paddingBlock={4}
+          >
+            <MuiCard />
           </Grid>
         </Grid>
       )}
@@ -84,46 +107,38 @@ const Main = ({ open, isloading }: AppBarProps) => {
 };
 
 const eventDay = (props: EventProps) => {
-  console.log(props);
-  const { day, events = [], outsideCurrentMonth } = props;
-
+  const { day, events = [], outsideCurrentMonth, ...other } = props;
   const isSelected = events.some(
     (event) => day.isSame(event) && !outsideCurrentMonth
   );
 
   return (
     <Badge overlap="circular" badgeContent={isSelected ? "✅" : undefined}>
-      <PickersDay {...props} />
+      <PickersDay
+        {...other}
+        outsideCurrentMonth={outsideCurrentMonth}
+        day={day}
+      />
     </Badge>
   );
 };
 
 const MuiMain = styled("main", {
-  shouldForwardProp: (prop) => prop !== "open" && prop !== "isloading",
+  shouldForwardProp: (prop) => prop !== "isloading",
 })<AppBarProps>(({ theme }) => ({
   height: "100%",
   opacity: 0.5,
-  transition: theme.transitions.create(["margin", "opacity"], {
+  transition: theme.transitions.create(["opacity"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   variants: [
     {
-      props: ({ open }) => open,
-      style: {
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(["margin"], {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      },
-    },
-    {
       props: ({ isloading }) => !isloading,
       style: {
         opacity: 1,
         transition: theme.transitions.create(["opacity"], {
-          easing: theme.transitions.easing.easeIn,
+          easing: theme.transitions.easing.easeInOut,
           duration: theme.transitions.duration.enteringScreen,
         }),
       },
