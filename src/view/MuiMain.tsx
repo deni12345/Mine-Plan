@@ -104,6 +104,8 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
             paddingBlock={3}
             rowGap={2}
             justifyContent={"space-evenly"}
+            maxHeight={"500px"}
+            sx={{ overflowY: "auto" }}
           >
             {selectedEventDay ? (
               selectedEventDay?.Detail?.map((detail, index) => {
