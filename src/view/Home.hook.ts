@@ -4,6 +4,7 @@ import {
   GoogleSpreadsheetWorksheet,
 } from "google-spreadsheet";
 import { useEffect, useMemo, useRef, useState } from "react";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 const DOC_ID = "18K9zsT265iGksYYClDnmWPWu02XayD2ujj44qFXLnAM";
 const SHEET_ID = 1482047481;
@@ -51,6 +52,8 @@ const useHome = () => {
     });
   }, []);
 
+  dayjs.extend(customParseFormat);
+
   useEffect(() => {
     const loadTripData = async () => {
       try {
@@ -97,6 +100,7 @@ const getPlan = async ({ sheet, trip }: Plan): Promise<Plan> => {
     const rawDate = sheet
       .getCell(rowIndex, 0)
       .formattedValue?.replace(/\n.*/, "");
+    console.log("rawDate", rawDate);
 
     // if the first row contain date, create new schedule
     if (!!rawDate) {
