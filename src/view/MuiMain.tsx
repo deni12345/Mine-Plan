@@ -46,7 +46,7 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
     ): void => {
       selectedView === "day" && setSelectedDay(dayjs(value));
     },
-    []
+    [setSelectedDay]
   );
 
   const selectedEventDay = useMemo(() => {
