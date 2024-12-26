@@ -53,7 +53,7 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
     return plan?.trip?.schedules?.find((schedule) =>
       schedule.planDate.isSame(selectedDay, "d")
     );
-  }, [plan, selectedDay]);
+  }, [plan?.trip?.schedules, selectedDay]);
 
   return (
     <MuiMain isloading={isloading}>
