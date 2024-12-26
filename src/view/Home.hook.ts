@@ -8,12 +8,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const DOC_ID = "18K9zsT265iGksYYClDnmWPWu02XayD2ujj44qFXLnAM";
 const SHEET_ID = 1482047481;
 
-interface Schedule {
+export interface Schedule {
   planDate: Dayjs;
   Detail: ScheduleDetail[];
 }
 
-interface ScheduleDetail {
+export interface ScheduleDetail {
   time: Dayjs;
   activity?: string;
   location?: string;
@@ -22,7 +22,7 @@ interface ScheduleDetail {
   Cost?: number;
 }
 
-interface Car {
+export interface Car {
   route: string;
   brand: string;
   operateAt: Dayjs;

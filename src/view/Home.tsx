@@ -31,7 +31,7 @@ const Home = () => {
   }, [selectedDay]);
 
   return (
-    <Grid container direction={"column"} height={"100vh"}>
+    <Grid container direction={"column"}>
       <HomeContext.Provider value={{ plan }}>
         <Grid>
           <MuiAppBar open={open}>

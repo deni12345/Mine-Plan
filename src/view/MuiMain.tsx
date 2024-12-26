@@ -6,7 +6,6 @@ import {
   Container,
   StackProps,
   styled,
-  Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -18,7 +17,7 @@ import {
   PickersDay,
   PickersDayProps,
 } from "@mui/x-date-pickers";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { HomeContext } from "./Home";
 import dayjs from "dayjs";
 import { PickerSelectionState } from "@mui/x-date-pickers/internals";
@@ -47,8 +46,14 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
     ): void => {
       selectedView === "day" && setSelectedDay(dayjs(value));
     },
-    [setSelectedDay]
+    []
   );
+
+  const selectedEventDay = useMemo(() => {
+    return plan?.trip?.schedules?.find((schedule) =>
+      schedule.planDate.isSame(selectedDay, "d")
+    );
+  }, [plan, selectedDay]);
 
   return (
     <MuiMain isloading={isloading}>
@@ -72,7 +77,7 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
           paddingBlock={{ xs: 1, md: 2 }}
           paddingInline={{ xs: 1, sm: 2, md: 6 }}
         >
-          <Grid component={Card} size={{ xs: 12, md: 3 }}>
+          <Grid component={Card} size={{ xs: 12, md: 3 }} paddingBlock={4}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
                 onChange={onDayChange}
@@ -93,12 +98,25 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
             </LocalizationProvider>
           </Grid>
           <Grid
+            container
             size={{ xs: 12, md: 8 }}
             component={Card}
-            justifyItems={"center"}
-            paddingBlock={4}
+            paddingBlock={3}
+            rowGap={2}
+            justifyContent={"space-evenly"}
           >
-            <MuiCard />
+            {selectedEventDay ? (
+              selectedEventDay?.Detail?.map((detail, index) => {
+                return (
+                  <MuiCard
+                    key={`${detail.location}#${index}`}
+                    scheduleDetail={detail}
+                  />
+                );
+              })
+            ) : (
+              <h1>Event not found</h1>
+            )}
           </Grid>
         </Grid>
       )}
@@ -126,7 +144,7 @@ const eventDay = (props: EventProps) => {
 const MuiMain = styled("main", {
   shouldForwardProp: (prop) => prop !== "isloading",
 })<AppBarProps>(({ theme }) => ({
-  height: "100%",
+  height: "100vh",
   opacity: 0.5,
   transition: theme.transitions.create(["opacity"], {
     easing: theme.transitions.easing.sharp,

@@ -1,43 +1,80 @@
 import {
+  Badge,
+  Box,
+  Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   IconButton,
+  Skeleton,
   Typography,
 } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ShareIcon from "@mui/icons-material/Share";
+import MapIcon from "@mui/icons-material/Map";
+import { ScheduleDetail } from "./Home.hook";
 
-const MuiCard = () => {
+interface MuiCardProps {
+  scheduleDetail: ScheduleDetail;
+}
+
+const MuiCard = ({ scheduleDetail }: MuiCardProps) => {
+  const { activity, time, location, locationURL, Phone } = scheduleDetail;
+
   return (
-    <Card
+    <Badge
+      overlap="circular"
+      color="warning"
+      badgeContent=""
       sx={{
-        width: { xs: "90%", md: "60%" },
-        padding: "10px",
-        fontSize: "12px",
+        height: "fit-content",
+        width: "90%",
+        ".MuiBadge-badge": {
+          border: "1px solid #fff",
+          borderRadius: "50%",
+          zIndex: 2,
+          top: "0px",
+          right: "1px",
+        },
       }}
     >
-      <CardHeader
-        title="Shrimp and Chorizo Paella"
-        subheader="September 14, 2016"
-      />
-      <CardContent>
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          This impressive paella is a perfect party dish and a fun meal to cook
-          together with your guests. Add 1 cup of frozen peas along with the
-          mussels, if you like.
-        </Typography>
+      <Card
+        sx={{
+          width: "100%",
+          padding: "10px",
+          fontSize: "12px",
+          margin: 0,
+        }}
+        variant="outlined"
+      >
+        <CardHeader
+          sx={{ paddingBlock: "8px" }}
+          title={`${time.format("HH:mm")} - ${activity?.toUpperCase()}`}
+        />
+        <CardContent sx={{ paddingBlock: "8px" }}>
+          <Box sx={{ paddingBlock: 1 }}>
+            <Typography variant="body1" sx={{ color: "primary" }}>
+              Location:
+            </Typography>
+            <Typography variant="body1" sx={{ color: "text.secondary" }}>
+              {location}
+            </Typography>
+          </Box>
+          <Typography variant="body1" sx={{ color: "primary" }}>
+            Phone: {Phone}
+          </Typography>
+        </CardContent>
         <CardActions disableSpacing>
-          <IconButton aria-label="add to favorites">
-            <FavoriteIcon />
-          </IconButton>
-          <IconButton aria-label="share">
-            <ShareIcon />
-          </IconButton>
+          <Button
+            variant="contained"
+            tabIndex={-1}
+            startIcon={<MapIcon />}
+            href={locationURL}
+          >
+            GO TO MAP
+          </Button>
         </CardActions>
-      </CardContent>
-    </Card>
+      </Card>
+    </Badge>
   );
 };
 
