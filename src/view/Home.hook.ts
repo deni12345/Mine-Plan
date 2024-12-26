@@ -63,6 +63,7 @@ const useHome = () => {
 
         plan = await getPlan(plan);
         setPlan(plan);
+        console.log(plan);
       } catch (error) {
         console.error(error);
       } finally {
