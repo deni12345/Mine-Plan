@@ -84,7 +84,6 @@ const getPlan = async ({ sheet, trip }: Plan): Promise<Plan> => {
     });
     return schs;
   }, []);
-  console.log(schedules);
 
   return { sheet, trip: { ...trip, schedules: schedules } } as Plan;
 };
