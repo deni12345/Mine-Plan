@@ -6,19 +6,24 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  IconButton,
-  Skeleton,
   Typography,
 } from "@mui/material";
 import MapIcon from "@mui/icons-material/Map";
-import { ScheduleDetail } from "./Home.hook";
+import { ScheduleDetail } from "../types/context";
 
 interface MuiCardProps {
-  scheduleDetail: ScheduleDetail;
+  detail: ScheduleDetail;
 }
 
-const MuiCard = ({ scheduleDetail }: MuiCardProps) => {
-  const { activity, time, location, locationURL, Phone } = scheduleDetail;
+const MuiCard = ({ detail: scheduleDetail }: MuiCardProps) => {
+  const {
+    activity,
+    time,
+    location,
+    locationURL,
+    locationBackup,
+    locationBackupURL,
+  } = scheduleDetail;
 
   return (
     <Badge
@@ -59,19 +64,36 @@ const MuiCard = ({ scheduleDetail }: MuiCardProps) => {
               {location}
             </Typography>
           </Box>
-          <Typography variant="body1" sx={{ color: "primary" }}>
-            Phone: {Phone}
-          </Typography>
+          {locationBackup && (
+            <Box sx={{ paddingBlock: 1 }}>
+              <Typography variant="body1" sx={{ color: "primary" }}>
+                Location Backup:
+              </Typography>
+              <Typography variant="body1" sx={{ color: "text.secondary" }}>
+                {locationBackup}
+              </Typography>
+            </Box>
+          )}
         </CardContent>
-        <CardActions disableSpacing>
+        <CardActions>
           <Button
             variant="contained"
             tabIndex={-1}
             startIcon={<MapIcon />}
-            href={locationURL}
+            href={locationURL ?? undefined}
           >
-            GO TO MAP
+            LOCATION
           </Button>
+          {locationBackupURL && (
+            <Button
+              variant="contained"
+              tabIndex={-1}
+              startIcon={<MapIcon />}
+              href={locationBackupURL ?? undefined}
+            >
+              LOCATION BACKUP
+            </Button>
+          )}
         </CardActions>
       </Card>
     </Badge>

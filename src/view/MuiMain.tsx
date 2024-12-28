@@ -1,12 +1,4 @@
-import {
-  Badge,
-  Box,
-  Card,
-  CircularProgress,
-  Container,
-  StackProps,
-  styled,
-} from "@mui/material";
+import { Badge, Card, StackProps, styled } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
@@ -17,11 +9,13 @@ import {
   PickersDay,
   PickersDayProps,
 } from "@mui/x-date-pickers";
-import { useCallback, useContext, useMemo } from "react";
+import { FC, useCallback, useContext, useMemo } from "react";
 import { HomeContext } from "./Home";
 import dayjs from "dayjs";
 import { PickerSelectionState } from "@mui/x-date-pickers/internals";
-import MuiCard from "./MuiCard";
+import MuiCard from "../component/MuiCard";
+import { Schedule } from "../types/context";
+import OverlayLoading from "../component/MuiOverlay";
 
 interface MainProps extends AppBarProps {
   selectedDay: dayjs.Dayjs;
@@ -37,7 +31,7 @@ interface EventProps extends PickersDayProps<dayjs.Dayjs> {
 }
 
 const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
-  const { plan } = useContext(HomeContext);
+  const { trip } = useContext(HomeContext);
   const onDayChange = useCallback(
     (
       value: any,
@@ -49,26 +43,22 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
     [setSelectedDay]
   );
 
-  const selectedEventDay = useMemo(() => {
-    return plan?.trip?.schedules?.find((schedule) =>
+  const eventSchedule = useMemo(() => {
+    return trip?.schedules.find((schedule) =>
       schedule.planDate.isSame(selectedDay, "d")
     );
-  }, [plan?.trip?.schedules, selectedDay]);
+  }, [trip, selectedDay]);
+
+  const events = useMemo<EventProps>(() => {
+    return {
+      events: trip?.schedules.map((schedule) => schedule.planDate),
+    } as EventProps;
+  }, [trip]);
 
   return (
     <MuiMain isloading={isloading}>
       {isloading ? (
-        <Box
-          component={Container}
-          sx={{
-            height: "100%",
-            justifyContent: "center",
-            alignContent: "center",
-            textAlign: "center",
-          }}
-        >
-          <CircularProgress />
-        </Box>
+        <OverlayLoading />
       ) : (
         <Grid
           container
@@ -85,14 +75,10 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
                 loading={isloading}
                 renderLoading={() => <DayCalendarSkeleton />}
                 slots={{
-                  day: eventDay,
+                  day: EventDaySlot,
                 }}
                 slotProps={{
-                  day: {
-                    events: plan.trip.schedules.map(
-                      (schedule) => schedule.planDate
-                    ),
-                  } as EventProps,
+                  day: events,
                 }}
               />
             </LocalizationProvider>
@@ -107,18 +93,7 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
             maxHeight={"500px"}
             sx={{ overflowY: "auto" }}
           >
-            {selectedEventDay ? (
-              selectedEventDay?.Detail?.map((detail, index) => {
-                return (
-                  <MuiCard
-                    key={`${detail.location}#${index}`}
-                    scheduleDetail={detail}
-                  />
-                );
-              })
-            ) : (
-              <h1>Event not found</h1>
-            )}
+            <EventDaysContent schedule={eventSchedule} />
           </Grid>
         </Grid>
       )}
@@ -126,7 +101,21 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
   );
 };
 
-const eventDay = (props: EventProps) => {
+const EventDaysContent: FC<{ schedule: Schedule | undefined }> = ({
+  schedule,
+}) => {
+  if (!schedule) return <h1>Event not found</h1>;
+
+  return (
+    <>
+      {schedule.Detail?.map((detail, index) => (
+        <MuiCard key={`${detail.location}#${index}`} detail={detail} />
+      ))}
+    </>
+  );
+};
+
+const EventDaySlot = (props: EventProps) => {
   const { day, events = [], outsideCurrentMonth, ...other } = props;
   const isSelected = events.some(
     (event) => day.isSame(event) && !outsideCurrentMonth

@@ -3,14 +3,14 @@ import Grid from "@mui/material/Grid2";
 import MenuIcon from "@mui/icons-material/Menu";
 import { createContext, useEffect, useState } from "react";
 import { MuiDrawer } from "./MuiDrawer";
-import { ContextType } from "../types/context";
-import useHome, { Plan } from "./Home.hook";
+import { ContextType, Trip } from "../types/context";
+import useHome from "./Home.hook";
 import Main from "./MuiMain";
-import MuiAppBar from "./MuiAppBar";
+import MuiAppBar from "../component/MuiAppBar";
 import dayjs from "dayjs";
 
 export const HomeContext = createContext<ContextType>({
-  plan: {} as Plan,
+  trip: {} as Trip,
 });
 
 const Home = () => {
@@ -26,13 +26,9 @@ const Home = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    console.log(selectedDay);
-  }, [selectedDay]);
-
   return (
     <Grid container direction={"column"}>
-      <HomeContext.Provider value={{ plan }}>
+      <HomeContext.Provider value={{ trip: plan.trip }}>
         <Grid>
           <MuiAppBar open={open}>
             <Toolbar>
