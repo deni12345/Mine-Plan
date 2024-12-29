@@ -135,7 +135,6 @@ const EventDaySlot = (props: EventProps) => {
 const MuiMain = styled("main", {
   shouldForwardProp: (prop) => prop !== "isloading",
 })<AppBarProps>(({ theme }) => ({
-  height: "100vh",
   opacity: 0.5,
   transition: theme.transitions.create(["opacity"], {
     easing: theme.transitions.easing.sharp,
