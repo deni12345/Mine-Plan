@@ -1,10 +1,6 @@
 import { Dayjs } from "dayjs";
 import { GoogleSpreadsheetWorksheet } from "google-spreadsheet";
 
-export interface ContextType {
-  trip?: Trip;
-}
-
 export interface Schedule {
   planDate: Dayjs;
   Detail: ScheduleDetail[];
@@ -30,9 +26,4 @@ export interface Trip {
   title: string;
   schedules: Schedule[];
   cars: Car[];
-}
-
-export interface Plan {
-  sheet: GoogleSpreadsheetWorksheet;
-  trip: Trip;
 }

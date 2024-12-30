@@ -1,20 +1,18 @@
 import { IconButton, Toolbar, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MenuIcon from "@mui/icons-material/Menu";
-import { createContext, useEffect, useState } from "react";
-import { MuiDrawer } from "./MuiDrawer";
-import { ContextType, Trip } from "../types/context";
-import useHome from "./Home.hook";
-import Main from "./MuiMain";
+import { createContext, useState } from "react";
+import { DrawerView } from "./DrawerView";
+import { Trip } from "../types/context";
+import useHome from "./Main.hook";
+import PlanView from "./PlanView";
 import MuiAppBar from "../component/MuiAppBar";
 import dayjs from "dayjs";
 
-export const HomeContext = createContext<ContextType>({
-  trip: {} as Trip,
-});
+export const HomeContext = createContext<Trip>({} as Trip);
 
-const Home = () => {
-  const { plan, isloading } = useHome();
+const Main = () => {
+  const { trip, isloading } = useHome();
   const [open, setOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<dayjs.Dayjs>(dayjs());
 
@@ -27,8 +25,8 @@ const Home = () => {
   };
 
   return (
-    <Grid container direction={"column"}>
-      <HomeContext.Provider value={{ trip: plan.trip }}>
+    <Grid container direction={"column"} height={"100vh"} flexWrap={"nowrap"}>
+      <HomeContext.Provider value={trip}>
         <Grid>
           <MuiAppBar open={open}>
             <Toolbar>
@@ -52,10 +50,10 @@ const Home = () => {
           </MuiAppBar>
         </Grid>
         <Grid>
-          <MuiDrawer open={open} handleDrawerClose={handleDrawerClose} />
+          <DrawerView open={open} handleDrawerClose={handleDrawerClose} />
         </Grid>
         <Grid flex={1}>
-          <Main
+          <PlanView
             setSelectedDay={setSelectedDay}
             selectedDay={selectedDay}
             isloading={isloading}
@@ -66,4 +64,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Main;

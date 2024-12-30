@@ -1,4 +1,4 @@
-import { Badge, Card, StackProps, styled } from "@mui/material";
+import { Badge, Card, Stack, StackProps, Zoom } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
@@ -10,7 +10,7 @@ import {
   PickersDayProps,
 } from "@mui/x-date-pickers";
 import { FC, useCallback, useContext, useMemo } from "react";
-import { HomeContext } from "./Home";
+import { HomeContext } from "./Main.layout";
 import dayjs from "dayjs";
 import { PickerSelectionState } from "@mui/x-date-pickers/internals";
 import MuiCard from "../component/MuiCard";
@@ -30,8 +30,8 @@ interface EventProps extends PickersDayProps<dayjs.Dayjs> {
   events?: dayjs.Dayjs[];
 }
 
-const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
-  const { trip } = useContext(HomeContext);
+const PlanView = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
+  const trip = useContext(HomeContext);
   const onDayChange = useCallback(
     (
       value: any,
@@ -44,60 +44,62 @@ const Main = ({ isloading, setSelectedDay, selectedDay }: MainProps) => {
   );
 
   const eventSchedule = useMemo(() => {
-    return trip?.schedules.find((schedule) =>
+    return trip?.schedules?.find((schedule) =>
       schedule.planDate.isSame(selectedDay, "d")
     );
   }, [trip, selectedDay]);
 
   const events = useMemo<EventProps>(() => {
     return {
-      events: trip?.schedules.map((schedule) => schedule.planDate),
+      events: trip?.schedules?.map((schedule) => schedule.planDate),
     } as EventProps;
   }, [trip]);
 
   return (
-    <MuiMain isloading={isloading}>
+    <Stack height={"100%"}>
       {isloading ? (
         <OverlayLoading />
       ) : (
-        <Grid
-          container
-          justifyContent={"space-evenly"}
-          gap={2}
-          paddingBlock={{ xs: 1, md: 2 }}
-          paddingInline={{ xs: 1, sm: 2, md: 6 }}
-        >
-          <Grid component={Card} size={{ xs: 12, md: 3 }} paddingBlock={4}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateCalendar
-                onChange={onDayChange}
-                value={selectedDay}
-                loading={isloading}
-                renderLoading={() => <DayCalendarSkeleton />}
-                slots={{
-                  day: EventDaySlot,
-                }}
-                slotProps={{
-                  day: events,
-                }}
-              />
-            </LocalizationProvider>
-          </Grid>
+        <Zoom in={!isloading}>
           <Grid
             container
-            size={{ xs: 12, md: 8 }}
-            component={Card}
-            paddingBlock={3}
-            rowGap={2}
             justifyContent={"space-evenly"}
-            maxHeight={"500px"}
-            sx={{ overflowY: "auto" }}
+            gap={2}
+            paddingBlock={{ xs: 1, md: 2 }}
+            paddingInline={{ xs: 1, sm: 2, md: 6 }}
           >
-            <EventDaysContent schedule={eventSchedule} />
+            <Grid component={Card} size={{ xs: 12, md: 3 }} paddingBlock={4}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                  onChange={onDayChange}
+                  value={selectedDay}
+                  loading={isloading}
+                  renderLoading={() => <DayCalendarSkeleton />}
+                  slots={{
+                    day: EventDaySlot,
+                  }}
+                  slotProps={{
+                    day: events,
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid
+              container
+              size={{ xs: 12, md: 8 }}
+              component={Card}
+              paddingBlock={3}
+              rowGap={2}
+              justifyContent={"space-evenly"}
+              maxHeight={"500px"}
+              sx={{ overflowY: "auto" }}
+            >
+              <EventDaysContent schedule={eventSchedule} />
+            </Grid>
           </Grid>
-        </Grid>
+        </Zoom>
       )}
-    </MuiMain>
+    </Stack>
   );
 };
 
@@ -132,26 +134,4 @@ const EventDaySlot = (props: EventProps) => {
   );
 };
 
-const MuiMain = styled("main", {
-  shouldForwardProp: (prop) => prop !== "isloading",
-})<AppBarProps>(({ theme }) => ({
-  opacity: 0.5,
-  transition: theme.transitions.create(["opacity"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  variants: [
-    {
-      props: ({ isloading }) => !isloading,
-      style: {
-        opacity: 1,
-        transition: theme.transitions.create(["opacity"], {
-          easing: theme.transitions.easing.easeInOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      },
-    },
-  ],
-}));
-
-export default Main;
+export default PlanView;

@@ -5,7 +5,7 @@ import {
 } from "google-spreadsheet";
 import { useEffect, useMemo, useRef, useState } from "react";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Car, Plan, Schedule, Trip } from "../types/context";
+import { Car, Schedule, Trip } from "../types/context";
 
 const SHEET_ID = parseInt(process.env.REACT_APP_SHEET_ID ?? "", 10);
 const DOC_ID = process.env.REACT_APP_DOC_ID ?? "";
@@ -14,7 +14,7 @@ dayjs.extend(customParseFormat);
 const useHome = () => {
   const sheetRef = useRef<GoogleSpreadsheetWorksheet | null>(null);
   const [isloading, setIsLoading] = useState(true);
-  const [plan, setPlan] = useState<Plan>({} as Plan);
+  const [trip, setTrip] = useState<Trip>({} as Trip);
   const doc = useMemo(() => {
     return new GoogleSpreadsheet(DOC_ID, {
       apiKey: "AIzaSyC5aUwKkR6alHA3jH8Ji9YQdHoTAlC1LlI",
@@ -26,12 +26,12 @@ const useHome = () => {
       try {
         await doc.loadInfo();
         sheetRef.current = doc.sheetsById[SHEET_ID];
-        let newPlan = await getCarInfo({
+        let trip = await getCarInfo({
           sheet: sheetRef.current,
           trip: {} as Trip,
         });
 
-        getPlan(newPlan).then(setPlan);
+        getTrip({ sheet: sheetRef.current, trip }).then(setTrip);
       } catch (error) {
         console.error(error);
       } finally {
@@ -41,11 +41,17 @@ const useHome = () => {
     loadTripData();
   }, [doc]);
 
-  return { plan, isloading, setIsLoading };
+  return { trip, isloading, setIsLoading };
 };
 
-const getPlan = async ({ sheet, trip }: Plan): Promise<Plan> => {
-  if (!sheet) return { sheet, trip };
+const getTrip = async ({
+  sheet,
+  trip,
+}: {
+  sheet: GoogleSpreadsheetWorksheet | null;
+  trip: Trip;
+}): Promise<Trip> => {
+  if (!sheet) return trip;
 
   // load rows from sheet
   const rows = await sheet?.getRows({
@@ -85,11 +91,17 @@ const getPlan = async ({ sheet, trip }: Plan): Promise<Plan> => {
     return schs;
   }, []);
 
-  return { sheet, trip: { ...trip, schedules: schedules } } as Plan;
+  return { ...trip, schedules: schedules } as Trip;
 };
 
-const getCarInfo = async ({ sheet, trip }: Plan): Promise<Plan> => {
-  if (!sheet) return { sheet, trip };
+const getCarInfo = async ({
+  sheet,
+  trip,
+}: {
+  sheet: GoogleSpreadsheetWorksheet | null;
+  trip: Trip;
+}): Promise<Trip> => {
+  if (!sheet) return trip;
 
   //load rows from sheet
   const rows = await sheet?.getRows({
@@ -116,10 +128,7 @@ const getCarInfo = async ({ sheet, trip }: Plan): Promise<Plan> => {
     return cars;
   }, []);
 
-  return {
-    sheet,
-    trip: { ...trip, cars },
-  } as Plan;
+  return { ...trip, cars: cars } as Trip;
 };
 
 export default useHome;

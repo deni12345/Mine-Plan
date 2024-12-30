@@ -17,12 +17,12 @@ import {
 
 export const drawerWidth = 240;
 
-interface MuiDrawerProps {
+interface DrawerViewProps {
   open?: boolean;
   handleDrawerClose?: () => void;
 }
 
-export const MuiDrawer = (props: MuiDrawerProps) => {
+export const DrawerView = (props: DrawerViewProps) => {
   const theme = useTheme();
   return (
     <Drawer
